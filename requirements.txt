@@ -1,0 +1,4 @@
+rcon
+discord
+dotenv
+mysql-connector-python
