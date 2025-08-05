@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands, tasks
+import Database.connection as db
 
 # Load environment variables from .env file
 load_dotenv()
@@ -13,6 +14,11 @@ class Client(commands.Bot):
         print(f'Logged in as {self.user} (ID: {self.user.id})')
         print('------')
 
+        try:
+            db.get_connection()
+            print("Database connection established successfully.")
+        except Exception as e:
+            print(f"Error establishing database connection: {e}")
 
 intents = discord.Intents.default()
 intents.messages = True
