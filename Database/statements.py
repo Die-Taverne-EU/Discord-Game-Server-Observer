@@ -4,7 +4,10 @@ class PreparedStatements(Enum):
     CREATE_SERVER_TABLE = """
         CREATE TABLE IF NOT EXISTS servers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            region TEXT NOT NULL
+            game_type TEXT NOT NULL,
+            address TEXT NOT NULL,
+            port INTEGER NOT NULL,
+            channel_id BIGINT NOT NULL,
+            message_id BIGINT NOT NULL
         )
     """
