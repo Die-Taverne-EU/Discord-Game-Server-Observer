@@ -18,4 +18,6 @@ intents.messages = True
 intents.message_content = True
 client = Client(command_prefix='.', intents=intents)
 
+
+
 client.run(TOKEN)
