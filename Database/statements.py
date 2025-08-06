@@ -11,20 +11,25 @@ class PreparedStatements(str, Enum):
             address TEXT NOT NULL,
             port INTEGER NOT NULL,
             channel_id BIGINT NOT NULL,
-            message_id BIGINT NOT NULL,
-            region TEXT NOT NULL,
+            message_id BIGINT,
+            country TEXT NOT NULL,
             lang TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """,
     INSERT_SERVER = """
-        INSERT INTO servers (game_type, address, port, channel_id, message_id, region, lang)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO servers (game_type, address, port, channel_id, country, lang)
+        VALUES (?, ?, ?, ?, ?, ?)
     """,
     UPDATE_SERVER = """
         UPDATE servers
-        SET game_type = ?, address = ?, port = ?, channel_id = ?, message_id = ?, region = ?, lang = ?
+        SET game_type = ?, address = ?, port = ?, channel_id = ?, message_id = ?, country = ?, lang = ?
+        WHERE id = ?
+    """,
+    ADD_SERVER_MESSAGE_ID = """
+        UPDATE servers
+        SET message_id = ?
         WHERE id = ?
     """,
     GET_SERVER = """
