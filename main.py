@@ -134,7 +134,9 @@ async def create_or_edit_server_embed(server_data):
                 message = await channel.fetch_message(message_id)
                 await message.edit(embed=embed, view=button)
             except discord.NotFound:
-                await channel.send(embed=embed)
+                message = await channel.send(embed=embed, view=button)
+
+                await db.Database().update_server_message_id(server_data['id'], message.id)
         else:
             message = await channel.send(embed=embed, view=button)
             # Update the database with the new message ID
