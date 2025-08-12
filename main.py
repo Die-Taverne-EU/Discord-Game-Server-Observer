@@ -125,6 +125,7 @@ async def query_server(server):
                 players = await a2sprotocol(addr, port).get_players()
                 if status.server_name != name:
                     db.Database().update_server_name(server[0], status.server_name)
+                print(f"Players: {players}")
                 server_data = {
                     'id': server[0],
                     'status': 'Online',

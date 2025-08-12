@@ -10,9 +10,9 @@ class ServerEmbed(Embed):
         self.add_field(name="Game", value=server_data['game'], inline=True)
         self.add_field(name="Map", value=server_data['map'], inline=True)
         self.add_field(name="Players", value=f"{server_data['numplayers']}/{server_data['maxplayers']}", inline=True)
-        if server_data['players']:
-            players_list = "\n".join([f"{player['name']} (Score: {player['raw']['score']}, Time: {player['raw']['time']})" for player in server_data['players']])
-            self.add_field(name="Players List", value=players_list, inline=False)
-        else:
-            self.add_field(name="Players List", value="No players online", inline=False)
+        # if server_data['players']:
+        #     players_list = "\n".join([f"{player['name']} (Score: {player['raw']['score']}, Time: {player['raw']['time']})" for player in server_data['players']])
+        #     self.add_field(name="Players List", value=players_list, inline=False)
+        # else:
+        #     self.add_field(name="Players List", value="No players online", inline=False)
         self.set_footer(text=f"Server ID: {server_data['id']}")
