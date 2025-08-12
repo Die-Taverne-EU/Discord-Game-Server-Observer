@@ -77,7 +77,6 @@ class Database:
         cursor.execute(statements.PreparedStatements.UPDATE_SERVER_NAME.__str__(), (name, server_id))
         conn.commit()
         self.close(conn, cursor)
-        self.close(conn, cursor)
     
     def get_server(self, server_id):
         conn, cursor = self.cursor()
