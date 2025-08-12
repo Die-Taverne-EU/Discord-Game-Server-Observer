@@ -112,7 +112,6 @@ client = Client(command_prefix='.', intents=intents)
 @discord.app_commands.describe(channelid="Channel ID to send the server information (if non, the current channel will be used)")
 async def addgameserver(interaction: discord.Interaction, channelid: str = None):
     """Command to add a server using a modal."""
-
     if channelid is None:
         channelid = interaction.channel_id
 
