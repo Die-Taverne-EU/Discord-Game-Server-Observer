@@ -26,8 +26,9 @@ class AddServerModal(Modal):
             country=self.country.value,
             lang="en"  # Default language, can be modified as needed
         )
-        await interaction.followup.send("Server added successfully!", ephemeral=True)
+
+        await interaction.response.send_message("Server added successfully!", ephemeral=True)
 
     async def on_error(self, interaction: discord.Interaction, error: Exception):
-        await interaction.followup.send(f"An error occurred: {error}", ephemeral=True)
+        await interaction.response.send_message(f"An error occurred: {error}", ephemeral=True)
         print(f"Error in AddServerModal: {error}")
