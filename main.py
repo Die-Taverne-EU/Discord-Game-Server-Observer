@@ -102,8 +102,6 @@ class Client(commands.Bot):
 
                     await create_or_edit_server_embed(server_data)
 
-
-
 intents = discord.Intents.default()
 intents.messages = True
 intents.message_content = True
@@ -142,4 +140,10 @@ async def create_or_edit_server_embed(server_data):
             # Update the database with the new message ID
             await db.Database().update_server_message_id(server_data['id'], message.id)
 
-client.run(TOKEN)
+if __name__ == "__main__":
+    if not TOKEN:
+        print("No token found in .env file. Please set the TOKEN variable.")
+    else:
+        print("Starting Discord Bot...")
+        client.run(TOKEN)
+
