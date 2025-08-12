@@ -153,7 +153,8 @@ async def query_server(server):
                     'maxplayers': 0,
                     'country': country,
                     'channel_id': server[4],
-                    'message_id': server[5]
+                    'message_id': server[5],
+                    'players': []
                 }
             print(f"Server Status: {status}")
             await create_or_edit_server_embed(server_data)
