@@ -14,6 +14,7 @@ class PreparedStatements(str, Enum):
             message_id BIGINT,
             country TEXT NOT NULL,
             lang TEXT NOT NULL,
+            name TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -30,6 +31,11 @@ class PreparedStatements(str, Enum):
     ADD_SERVER_MESSAGE_ID = """
         UPDATE servers
         SET message_id = ?
+        WHERE id = ?
+    """,
+    UPDATE_SERVER_NAME = """
+        UPDATE servers
+        SET name = ?
         WHERE id = ?
     """,
     GET_SERVER = """
