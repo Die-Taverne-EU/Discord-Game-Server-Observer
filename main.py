@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands, tasks
+from zmq import SERVER
 import Database.database as db
 from modals import AddServerModal
 from embeds import ServerEmbed
@@ -22,7 +23,7 @@ load_dotenv()
 TOKEN = os.getenv('TOKEN')
 GUILD = discord.Object(id=os.getenv('SERVER_ID'))
 
-STATI = []
+SERVER_COUNT = 0
 
 class Client(commands.Bot):
     async def on_ready(self):
@@ -37,13 +38,21 @@ class Client(commands.Bot):
 
         self.db = db.Database()
         await self.db.create_tables()
-        await self.change_presence(activity=discord.Game(name="Observing Servers"))
+        global SERVER_COUNT
+        SERVER_COUNT = await self.db.count_servers()
+        await self.change_presence(activity=discord.Game(name=f"Observing {SERVER_COUNT} Servers"))
         self.check_servers.start()
 
     @tasks.loop(seconds=60)
     async def check_servers(self):
         """Periodically check the status of servers."""
         all_servers = await self.db.get_all_servers()
+        global SERVER_COUNT
+
+        if len(all_servers) != SERVER_COUNT:
+            SERVER_COUNT = len(all_servers)
+            await self.change_presence(activity=discord.Game(name=f"Observing {SERVER_COUNT} Servers"))
+
         for server in all_servers:
             # Here you would implement the logic to check the server status
             # For example, pinging the server or checking its availability

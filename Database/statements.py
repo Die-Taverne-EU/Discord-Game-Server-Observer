@@ -49,6 +49,9 @@ class PreparedStatements(str, Enum):
     GET_SERVER_BY_ADDRESS_PORT = """
         SELECT * FROM servers WHERE address = ? AND port = ?
     """,
+    COUNT_SERVERS = """
+        SELECT COUNT(*) FROM servers
+    """,
     DELETE_SERVER = """
         DELETE FROM servers WHERE id = ?
     """,

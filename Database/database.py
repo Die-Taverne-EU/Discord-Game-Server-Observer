@@ -111,3 +111,10 @@ class Database:
         cursor.execute(statements.PreparedStatements.DELETE_SERVER.__str__(), (server_id,))
         conn.commit()
         self.close(conn, cursor)
+
+    async def count_servers(self):
+        conn, cursor = self.cursor()
+        cursor.execute(statements.PreparedStatements.COUNT_SERVERS.__str__())
+        count = cursor.fetchone()[0]
+        self.close(conn, cursor)
+        return count
