@@ -53,54 +53,10 @@ class Client(commands.Bot):
             await self.change_presence(activity=discord.Game(name=f"Observing {SERVER_COUNT} Servers"))
 
         for server in all_servers:
+            await query_server(server)
             # Here you would implement the logic to check the server status
             # For example, pinging the server or checking its availability
-            gametype = server[1]
-            addr = server[2]
-            port = server[3]
-            country = server[6] if len(server) > 6 else AllowedCountries.UNKNOWN.value
-            name = server[8] if len(server) > 8 else 'Unknown'
-            print(f"Checking {gametype} server at {addr}:{port}")
-            match gametype:
-                case AllowedGameTypes.SOURCE.value:
-                    status = await a2sprotocol(addr, port).get_info()
-                    if status:
-                        players = await a2sprotocol(addr, port).get_players()
-                        if status.server_name != name:
-                            await self.db.update_server_name(server[0], status.server_name)
-                        server_data = {
-                            'id': server[0],
-                            'status': 'Online',
-                            'game': status.game,
-                            'ip': addr,
-                            'port': port,
-                            'name': status.server_name,
-                            'map': status.map_name,
-                            'numplayers': status.player_count,
-                            'maxplayers': status.max_players,
-                            'country': country,
-                            'channel_id': server[4],
-                            'message_id': server[5],
-                            'players': players
-                        }
-                    else:
-                        server_data = {
-                            'id': server[0],
-                            'status': 'Offline',
-                            'game': 'Unknown',
-                            'ip': addr,
-                            'port': port,
-                            'name': name,
-                            'map': 'Unknown',
-                            'numplayers': 0,
-                            'maxplayers': 0,
-                            'country': country,
-                            'channel_id': server[4],
-                            'message_id': server[5]
-                        }
-                    print(f"Server Status: {status}")
-
-                    await create_or_edit_server_embed(server_data)
+            
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -109,15 +65,27 @@ client = Client(command_prefix='.', intents=intents)
 
 @client.tree.command(name='addgameserver', description='Adds a new server to the database', guild=GUILD)
 @discord.app_commands.checks.has_permissions(administrator=True)
-@discord.app_commands.describe(channelid="Channel ID to send the server information (if non, the current channel will be used)")
-async def addgameserver(interaction: discord.Interaction, channelid: str = None):
+@discord.app_commands.describe(gametype="Game type of the server (e.g., source)", address="IP address or hostname of the server", port="Port of the server", countrycode="Country code of the server (default: de)", channelid="Channel ID to send the server information (if non, the current channel will be used)")
+async def addgameserver(interaction: discord.Interaction, gametype: str, address: str, port: int, countrycode: str = "de", channelid: str = None):
     """Command to add a server using a modal."""
+    await interaction.response.defer(ephemeral=True)
     if channelid is None:
         channelid = interaction.channel_id
 
-    modal = AddServerModal(channelID=channelid)
+    await db.Database().insert_server(
+        game_type=gametype,
+        address=address,
+        port=port,
+        channel_id=channelid,
+        country=countrycode,
+        lang="en"
+    )
 
-    await interaction.response.send_modal(modal)
+    server = await db.Database().get_server_by_address_port(address, port)
+
+    await query_server(server)
+
+    await interaction.followup.send("Server added successfully!", ephemeral=True)
 
 async def create_or_edit_server_embed(server_data):
     """Creates or edits a server embed."""
@@ -138,6 +106,53 @@ async def create_or_edit_server_embed(server_data):
             message = await channel.send(embed=embed, view=button)
             # Update the database with the new message ID
             await db.Database().update_server_message_id(server_data['id'], message.id)
+
+async def query_server(server):
+    gametype = server[1]
+    addr = server[2]
+    port = server[3]
+    country = server[6] if len(server) > 6 else AllowedCountries.UNKNOWN.value
+    name = server[8] if len(server) > 8 else 'Unknown'
+    print(f"Checking {gametype} server at {addr}:{port}")
+    match gametype:
+        case AllowedGameTypes.SOURCE.value:
+            status = await a2sprotocol(addr, port).get_info()
+            if status:
+                players = await a2sprotocol(addr, port).get_players()
+                if status.server_name != name:
+                    await db.Database().update_server_name(server[0], status.server_name)
+                server_data = {
+                    'id': server[0],
+                    'status': 'Online',
+                    'game': status.game,
+                    'ip': addr,
+                    'port': port,
+                    'name': status.server_name,
+                    'map': status.map_name,
+                    'numplayers': status.player_count,
+                    'maxplayers': status.max_players,
+                    'country': country,
+                    'channel_id': server[4],
+                    'message_id': server[5],
+                    'players': players
+                }
+            else:
+                server_data = {
+                    'id': server[0],
+                    'status': 'Offline',
+                    'game': 'Unknown',
+                    'ip': addr,
+                    'port': port,
+                    'name': name,
+                    'map': 'Unknown',
+                    'numplayers': 0,
+                    'maxplayers': 0,
+                    'country': country,
+                    'channel_id': server[4],
+                    'message_id': server[5]
+                }
+            print(f"Server Status: {status}")
+            await create_or_edit_server_embed(server_data)
 
 if __name__ == "__main__":
     if not TOKEN:
