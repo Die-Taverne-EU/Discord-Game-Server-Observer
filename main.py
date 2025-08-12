@@ -3,7 +3,6 @@ import os
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands, tasks
-from zmq import SERVER
 import Database.database as db
 from modals import AddServerModal
 from embeds import ServerEmbed
