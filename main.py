@@ -96,18 +96,18 @@ async def create_or_edit_server_embed(server_data):
     channel = client.get_channel(server_data['channel_id'])
     if channel:
         embed = ServerEmbed(server_data)
-        button = ConnectButton(server_data['ip'], server_data['port'])
+        # button = ConnectButton(server_data['ip'], server_data['port'])
         message_id = server_data['message_id']
         if message_id:
             try:
                 message = await channel.fetch_message(message_id)
-                await message.edit(embed=embed, view=button)
+                await message.edit(embed=embed)
             except discord.NotFound:
-                message = await channel.send(embed=embed, view=button)
+                message = await channel.send(embed=embed)
 
                 db.Database().update_server_message_id(server_data['id'], message.id)
         else:
-            message = await channel.send(embed=embed, view=button)
+            message = await channel.send(embed=embed)
             # Update the database with the new message ID
             db.Database().update_server_message_id(server_data['id'], message.id)
 
