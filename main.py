@@ -36,16 +36,16 @@ class Client(commands.Bot):
             print(f'Error syncing commands: {e}')
 
         self.db = db.Database()
-        await self.db.create_tables()
+        self.db.create_tables()
         global SERVER_COUNT
-        SERVER_COUNT = await self.db.count_servers()
+        SERVER_COUNT = self.db.count_servers()
         await self.change_presence(activity=discord.Game(name=f"Observing {SERVER_COUNT} Servers"))
         self.check_servers.start()
 
     @tasks.loop(seconds=60)
     async def check_servers(self):
         """Periodically check the status of servers."""
-        all_servers = await self.db.get_all_servers()
+        all_servers = self.db.get_all_servers()
         global SERVER_COUNT
 
         if len(all_servers) != SERVER_COUNT:
@@ -87,7 +87,7 @@ async def addgameserver(interaction: discord.Interaction, channelid: str = None)
 
     modal = AddServerModal(channelID=channelid)
 
-    await interaction.response.send_modal(modal)
+    return await interaction.response.send_modal(modal)
 
     # await interaction.followup.send("Server added successfully!", ephemeral=True)
 
@@ -105,11 +105,11 @@ async def create_or_edit_server_embed(server_data):
             except discord.NotFound:
                 message = await channel.send(embed=embed, view=button)
 
-                await db.Database().update_server_message_id(server_data['id'], message.id)
+                db.Database().update_server_message_id(server_data['id'], message.id)
         else:
             message = await channel.send(embed=embed, view=button)
             # Update the database with the new message ID
-            await db.Database().update_server_message_id(server_data['id'], message.id)
+            db.Database().update_server_message_id(server_data['id'], message.id)
 
 async def query_server(server):
     gametype = server[1]
@@ -124,7 +124,7 @@ async def query_server(server):
             if status:
                 players = await a2sprotocol(addr, port).get_players()
                 if status.server_name != name:
-                    await db.Database().update_server_name(server[0], status.server_name)
+                    db.Database().update_server_name(server[0], status.server_name)
                 server_data = {
                     'id': server[0],
                     'status': 'Online',

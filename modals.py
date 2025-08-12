@@ -18,7 +18,7 @@ class AddServerModal(Modal):
 
     async def on_submit(self, interaction: discord.Interaction):
         # Here you would handle the submission, e.g., save to the database
-        await db.Database().insert_server(
+        db.Database().insert_server(
             game_type=self.game_type.value,
             address=self.ip.value,
             port=int(self.port.value),
@@ -27,8 +27,8 @@ class AddServerModal(Modal):
             lang="en"  # Default language, can be modified as needed
         )
 
-        await interaction.response.send_message("Server added successfully!", ephemeral=True)
+        return await interaction.response.send_message("Server added successfully!", ephemeral=True)
 
     async def on_error(self, interaction: discord.Interaction, error: Exception):
-        await interaction.response.send_message(f"An error occurred: {error}", ephemeral=True)
+        return await interaction.response.send_message(f"An error occurred: {error}", ephemeral=True)
         print(f"Error in AddServerModal: {error}")
