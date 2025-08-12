@@ -1,5 +1,4 @@
 from enum import Enum
-from pickle import GET
 
 class PreparedStatements(str, Enum):
     def __str__(self):

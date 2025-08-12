@@ -2,7 +2,7 @@ import sqlite3
 from dotenv import load_dotenv
 import os
 from enum import Enum
-from Database import statements
+import Database.statements as statements
 
 load_dotenv()
 
