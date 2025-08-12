@@ -1,0 +1,8 @@
+services:
+  dtv-gameserver-bot:
+    build: .
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    restart: always
