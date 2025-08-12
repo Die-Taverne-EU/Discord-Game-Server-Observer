@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands, tasks
-import Database.database as db
+from Database.database import Database as db
 from modals import AddServerModal
 from embeds import ServerEmbed
 from buttons import ConnectButton
