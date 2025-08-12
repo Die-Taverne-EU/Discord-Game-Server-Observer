@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands, tasks
-from Database import database as db
+from Database.database import Database
 from modals import AddServerModal
 from embeds import ServerEmbed
 from buttons import ConnectButton
@@ -35,7 +35,7 @@ class Client(commands.Bot):
         except Exception as e:
             print(f'Error syncing commands: {e}')
 
-        self.db = db.Database()
+        self.db = Database()
         await self.db.create_tables()
         await self.change_presence(activity=discord.Game(name="Observing Servers"))
         self.check_servers.start()
@@ -130,6 +130,6 @@ async def create_or_edit_server_embed(server_data):
         else:
             message = await channel.send(embed=embed, view=button)
             # Update the database with the new message ID
-            await db.Database().update_server_message_id(server_data['id'], message.id)
+            await Database().update_server_message_id(server_data['id'], message.id)
 
 client.run(TOKEN)
