@@ -96,18 +96,18 @@ async def create_or_edit_server_embed(server_data):
     channel = client.get_channel(server_data['channel_id'])
     if channel:
         embed = ServerEmbed(server_data)
-        # button = ConnectButton(server_data['ip'], server_data['port'])
+        button = ConnectButton(server_data['ip'], server_data['port'])
         message_id = server_data['message_id']
         if message_id:
             try:
                 message = await channel.fetch_message(message_id)
-                await message.edit(embed=embed)
+                await message.edit(embed=embed, view=button)
             except discord.NotFound:
-                message = await channel.send(embed=embed)
+                message = await channel.send(embed=embed, view=button)
 
                 db.Database().update_server_message_id(server_data['id'], message.id)
         else:
-            message = await channel.send(embed=embed)
+            message = await channel.send(embed=embed, view=button)
             # Update the database with the new message ID
             db.Database().update_server_message_id(server_data['id'], message.id)
 
@@ -122,10 +122,8 @@ async def query_server(server):
         case AllowedGameTypes.SOURCE.value:
             status = await a2sprotocol(addr, port).get_info()
             if status:
-                players = await a2sprotocol(addr, port).get_players()
                 if status.server_name != name:
                     db.Database().update_server_name(server[0], status.server_name)
-                print(f"Players: {players}")
                 server_data = {
                     'id': server[0],
                     'status': 'Online',
@@ -138,8 +136,7 @@ async def query_server(server):
                     'maxplayers': status.max_players,
                     'country': country,
                     'channel_id': server[4],
-                    'message_id': server[5],
-                    'players': players
+                    'message_id': server[5]
                 }
             else:
                 server_data = {
@@ -154,8 +151,7 @@ async def query_server(server):
                     'maxplayers': 0,
                     'country': country,
                     'channel_id': server[4],
-                    'message_id': server[5],
-                    'players': []
+                    'message_id': server[5]
                 }
             print(f"Server Status: {status}")
             await create_or_edit_server_embed(server_data)
