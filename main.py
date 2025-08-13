@@ -21,6 +21,7 @@ class AllowedCountries(Enum):
 load_dotenv()
 TOKEN = os.getenv('TOKEN')
 GUILD = discord.Object(id=os.getenv('SERVER_ID'))
+STEAM_CONNECT_URL = os.getenv('STEAM_CONNECT_URL')
 
 SERVER_COUNT = 0
 
@@ -96,7 +97,10 @@ async def create_or_edit_server_embed(server_data):
     channel = client.get_channel(server_data['channel_id'])
     if channel:
         embed = ServerEmbed(server_data)
-        button = ConnectButton(server_data['ip'], server_data['port'])
+        if STEAM_CONNECT_URL:
+            button = ConnectButton(server_data['ip'], server_data['port'])
+        else:
+            button = None
         message_id = server_data['message_id']
         if message_id:
             try:
