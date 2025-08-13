@@ -96,6 +96,16 @@ async def removegameserver(interaction: discord.Interaction, server_id: int):
 
     return await interaction.followup.send(f"No server found with ID {server_id}.", ephemeral=True)
 
+@client.tree.command(name='queryserversnow', description='Queries all servers for their current status', guild=GUILD)
+@discord.app_commands.checks.has_permissions(administrator=True)
+async def query_servers_now(interaction: discord.Interaction):
+    """Queries all servers for their current status."""
+    await interaction.response.defer()
+    all_servers = db.Database().get_all_servers()
+    for server in all_servers:
+        await query_server(server)
+    return await interaction.followup.send("Server status query initiated.", ephemeral=True)
+
 async def create_or_edit_server_embed(server_data):
     """Creates or edits a server embed."""
     channel = client.get_channel(server_data['channel_id'])
