@@ -69,28 +69,32 @@ client = Client(command_prefix='.', intents=intents)
 # @discord.app_commands.describe(gametype="Game type of the server (e.g., source)", address="IP address or hostname of the server", port="Port of the server", countrycode="Country code of the server (default: de)", channelid="Channel ID to send the server information (if non, the current channel will be used)")
 async def addgameserver(interaction: discord.Interaction, channelid: str = None):
     """Command to add a server using a modal."""
-    # await interaction.response.defer(ephemeral=True)
     if channelid is None:
         channelid = interaction.channel_id
-
-    # await db.Database().insert_server(
-    #     game_type=gametype,
-    #     address=address,
-    #     port=port,
-    #     channel_id=channelid,
-    #     country=countrycode,
-    #     lang="en"
-    # )
-
-    # server = await db.Database().get_server_by_address_port(address, port)
-
-    # await query_server(server)
 
     modal = AddServerModal(channelID=channelid)
 
     return await interaction.response.send_modal(modal)
 
-    # await interaction.followup.send("Server added successfully!", ephemeral=True)
+
+@client.tree.command(name='removegameserver', description='Removes a server and its message by id', guild=GUILD)
+@discord.app_commands.checks.has_permissions(administrator=True)
+async def removegameserver(interaction: discord.Interaction, server_id: int):
+    """Command to remove a server."""
+    await interaction.response.defer()
+    server = db.Database().get_server(server_id)
+    channel = client.get_channel(server[4]) if server else None
+
+    if channel:
+        message = await channel.fetch_message(server[5])
+        if not message:
+            return await interaction.followup.send(f"No message found for server ID {server_id}.", ephemeral=True)
+        await message.delete()
+
+        db.Database().delete_server(server_id)
+        return await interaction.followup.send(f"Server with ID {server_id} removed successfully.", ephemeral=True)
+
+    return await interaction.followup.send(f"No server found with ID {server_id}.", ephemeral=True)
 
 async def create_or_edit_server_embed(server_data):
     """Creates or edits a server embed."""
